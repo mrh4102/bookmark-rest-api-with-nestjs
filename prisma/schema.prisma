@@ -9,3 +9,11 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Bookmark {
+  id          Int    @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String
+  url         String
+}
