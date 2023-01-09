@@ -1,0 +1,35 @@
+###
+
+GET http://localhost:3000/bookmarks
+
+###
+
+POST http://localhost:3000/bookmarks
+Content-Type: application/json
+
+{
+    "title": "My bookmark",
+    "description": "My bookmark description",
+    "url": "https://bookmark.com"
+}
+
+###
+
+GET http://localhost:3000/bookmarks/1
+
+###
+
+PATCH http://localhost:3000/bookmarks/1
+Content-Type: application/json
+
+{
+    "title": "My bookmark updated",
+    "description": "My bookmark description updated",
+    "url": "https://bookmark.com.updated"
+}
+
+###
+
+DELETE http://localhost:3000/bookmarks/1
+
+###
