@@ -1,5 +1,25 @@
 ###
 
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+    "username": "username",
+    "password": "password"
+}
+
+###
+
+POST http://localhost:3000/signin
+Content-Type: application/json
+
+{
+    "username": "username",
+    "password": "password"
+}
+
+###
+
 GET http://localhost:3000/bookmarks
 
 ###
