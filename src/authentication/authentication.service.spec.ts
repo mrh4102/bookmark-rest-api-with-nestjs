@@ -1,3 +1,5 @@
+import * as argon2 from 'argon2';
+
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
@@ -42,6 +44,10 @@ describe('AuthenticationService', () => {
       password,
     };
 
+    beforeAll(async () => {
+      user.password = await argon2.hash(password);
+    });
+
     it('should signup user', async () => {
       jest.spyOn(prismaService.user, 'create').mockResolvedValueOnce(user);
 
@@ -64,6 +70,10 @@ describe('AuthenticationService', () => {
       username,
       password,
     };
+
+    beforeAll(async () => {
+      user.password = await argon2.hash(password);
+    });
 
     it('should throw not found exception', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(null);

@@ -1,3 +1,5 @@
+import * as argon2 from 'argon2';
+
 import {
   ForbiddenException,
   Injectable,
@@ -14,8 +16,9 @@ export class AuthenticationService {
 
   async signup(dto: UserDto): Promise<User> {
     try {
+      const hash = await argon2.hash(dto.password);
       const user = await this.prismaService.user.create({
-        data: { ...dto },
+        data: { ...dto, password: hash },
       });
       return user;
     } catch (error) {
@@ -31,7 +34,8 @@ export class AuthenticationService {
       if (!user) {
         throw new NotFoundException();
       }
-      if (user.password !== dto.password) {
+      const isVerified = await argon2.verify(user.password, dto.password);
+      if (!isVerified) {
         throw new ForbiddenException();
       }
       return user;
