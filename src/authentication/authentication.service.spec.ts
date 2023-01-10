@@ -1,8 +1,13 @@
 import * as argon2 from 'argon2';
 
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticationService } from './authentication.service';
@@ -46,6 +51,20 @@ describe('AuthenticationService', () => {
 
     beforeAll(async () => {
       user.password = await argon2.hash(password);
+    });
+
+    it('should throw bad request exception', async () => {
+      jest.spyOn(prismaService.user, 'create').mockImplementationOnce(() => {
+        throw new PrismaClientKnownRequestError('unique constraint', {
+          clientVersion: '1.0.0',
+          code: 'P2002',
+        });
+      });
+
+      const response = authenticationService.signup(dto);
+      const expected = BadRequestException;
+      await expect(response).rejects.toBeInstanceOf(expected);
+      expect(prismaService.user.create).toBeCalled();
     });
 
     it('should signup user', async () => {
