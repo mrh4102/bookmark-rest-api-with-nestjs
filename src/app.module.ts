@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 
+import { BookmarkModule } from './bookmark/bookmark.module';
+
 @Module({
-  imports: [],
+  imports: [BookmarkModule],
   controllers: [],
   providers: [],
 })
