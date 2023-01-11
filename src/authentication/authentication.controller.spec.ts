@@ -5,7 +5,7 @@ import { User } from '@prisma/client';
 
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
-import { UserDto } from './dto';
+import { TokenDto, UserDto } from './dto';
 
 describe('AuthenticationController', () => {
   let authenticationService: AuthenticationService;
@@ -39,9 +39,12 @@ describe('AuthenticationController', () => {
       username,
       password,
     };
-    const dto: UserDto = {
+    const userDto: UserDto = {
       username,
       password,
+    };
+    const tokenDto: TokenDto = {
+      access_token: 'token',
     };
 
     beforeAll(async () => {
@@ -49,13 +52,15 @@ describe('AuthenticationController', () => {
     });
 
     it('should signup user', async () => {
-      jest.spyOn(authenticationService, 'signup').mockResolvedValueOnce(user);
+      jest
+        .spyOn(authenticationService, 'signup')
+        .mockResolvedValueOnce(tokenDto);
 
-      const response = authenticationController.signup(dto);
-      const expected = user;
+      const response = authenticationController.signup(userDto);
+      const expected = tokenDto;
       await expect(response).resolves.toEqual(expected);
       expect(authenticationService.signup).toBeCalled();
-      expect(authenticationService.signup).toBeCalledWith(dto);
+      expect(authenticationService.signup).toBeCalledWith(userDto);
     });
   });
 
@@ -67,9 +72,12 @@ describe('AuthenticationController', () => {
       username,
       password,
     };
-    const dto: UserDto = {
+    const userDto: UserDto = {
       username,
       password,
+    };
+    const tokenDto: TokenDto = {
+      access_token: 'token',
     };
 
     beforeAll(async () => {
@@ -77,13 +85,15 @@ describe('AuthenticationController', () => {
     });
 
     it('should signin user', async () => {
-      jest.spyOn(authenticationService, 'signin').mockResolvedValueOnce(user);
+      jest
+        .spyOn(authenticationService, 'signin')
+        .mockResolvedValueOnce(tokenDto);
 
-      const response = authenticationController.signin(dto);
-      const expected = user;
+      const response = authenticationController.signin(userDto);
+      const expected = tokenDto;
       await expect(response).resolves.toEqual(expected);
       expect(authenticationService.signin).toBeCalled();
-      expect(authenticationService.signin).toBeCalledWith(dto);
+      expect(authenticationService.signin).toBeCalledWith(userDto);
     });
   });
 });
