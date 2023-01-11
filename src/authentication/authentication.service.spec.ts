@@ -5,21 +5,23 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticationService } from './authentication.service';
-import { UserDto } from './dto';
+import { TokenDto, UserDto } from './dto';
 
 describe('AuthenticationService', () => {
   let prismaService: PrismaService;
+  let jwtService: JwtService;
   let authenticationService: AuthenticationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService, AuthenticationService],
+      providers: [PrismaService, JwtService, AuthenticationService],
     })
       .overrideProvider(PrismaService)
       .useValue({
@@ -28,9 +30,14 @@ describe('AuthenticationService', () => {
           create: jest.fn(),
         },
       })
+      .overrideProvider(JwtService)
+      .useValue({
+        sign: jest.fn(),
+      })
       .compile();
 
     prismaService = module.get<PrismaService>(PrismaService);
+    jwtService = module.get<JwtService>(JwtService);
     authenticationService = module.get<AuthenticationService>(
       AuthenticationService,
     );
@@ -47,6 +54,9 @@ describe('AuthenticationService', () => {
     const userDto: UserDto = {
       username,
       password,
+    };
+    const tokenDto: TokenDto = {
+      access_token: 'token',
     };
 
     beforeAll(async () => {
@@ -69,11 +79,13 @@ describe('AuthenticationService', () => {
 
     it('should signup user', async () => {
       jest.spyOn(prismaService.user, 'create').mockResolvedValueOnce(user);
+      jest.spyOn(jwtService, 'sign').mockReturnValueOnce(tokenDto.access_token);
 
       const response = authenticationService.signup(userDto);
-      const expected = user;
+      const expected = tokenDto;
       await expect(response).resolves.toEqual(expected);
       expect(prismaService.user.create).toBeCalled();
+      expect(jwtService.sign).toBeCalled();
     });
   });
 
@@ -88,6 +100,9 @@ describe('AuthenticationService', () => {
     const userDto: UserDto = {
       username,
       password,
+    };
+    const tokenDto: TokenDto = {
+      access_token: 'token',
     };
 
     beforeAll(async () => {
@@ -120,11 +135,13 @@ describe('AuthenticationService', () => {
 
     it('should signin user', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(user);
+      jest.spyOn(jwtService, 'sign').mockReturnValueOnce(tokenDto.access_token);
 
       const response = authenticationService.signin(userDto);
-      const expected = user;
+      const expected = tokenDto;
       await expect(response).resolves.toEqual(expected);
       expect(prismaService.user.findUnique).toBeCalled();
+      expect(jwtService.sign).toBeCalled();
     });
   });
 });
