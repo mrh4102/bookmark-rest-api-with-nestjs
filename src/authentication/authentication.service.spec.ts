@@ -44,7 +44,7 @@ describe('AuthenticationService', () => {
       username,
       password,
     };
-    const dto: UserDto = {
+    const userDto: UserDto = {
       username,
       password,
     };
@@ -61,7 +61,7 @@ describe('AuthenticationService', () => {
         });
       });
 
-      const response = authenticationService.signup(dto);
+      const response = authenticationService.signup(userDto);
       const expected = BadRequestException;
       await expect(response).rejects.toBeInstanceOf(expected);
       expect(prismaService.user.create).toBeCalled();
@@ -70,7 +70,7 @@ describe('AuthenticationService', () => {
     it('should signup user', async () => {
       jest.spyOn(prismaService.user, 'create').mockResolvedValueOnce(user);
 
-      const response = authenticationService.signup(dto);
+      const response = authenticationService.signup(userDto);
       const expected = user;
       await expect(response).resolves.toEqual(expected);
       expect(prismaService.user.create).toBeCalled();
@@ -85,7 +85,7 @@ describe('AuthenticationService', () => {
       username,
       password,
     };
-    const dto: UserDto = {
+    const userDto: UserDto = {
       username,
       password,
     };
@@ -98,8 +98,8 @@ describe('AuthenticationService', () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(null);
 
       const response = authenticationService.signin({
-        username: dto.username + 'x',
-        password: dto.password,
+        username: userDto.username + 'x',
+        password: userDto.password,
       });
       const expected = NotFoundException;
       await expect(response).rejects.toBeInstanceOf(expected);
@@ -110,8 +110,8 @@ describe('AuthenticationService', () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(user);
 
       const response = authenticationService.signin({
-        username: dto.username,
-        password: dto.password + 'x',
+        username: userDto.username,
+        password: userDto.password + 'x',
       });
       const expected = ForbiddenException;
       await expect(response).rejects.toBeInstanceOf(expected);
@@ -121,7 +121,7 @@ describe('AuthenticationService', () => {
     it('should signin user', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(user);
 
-      const response = authenticationService.signin(dto);
+      const response = authenticationService.signin(userDto);
       const expected = user;
       await expect(response).resolves.toEqual(expected);
       expect(prismaService.user.findUnique).toBeCalled();
