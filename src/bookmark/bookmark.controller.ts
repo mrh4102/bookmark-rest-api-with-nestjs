@@ -7,16 +7,19 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { Bookmark } from '@prisma/client';
 
 import { User } from '../app.decorator';
+import { JwtAuthGuard } from '../authentication/jwt/guard';
 import { BookmarkService } from './bookmark.service';
 import { CreateBookmarkDto, UpdateBookmarkDto } from './dto';
 
 @Controller('bookmarks')
+@UseGuards(new JwtAuthGuard())
 @UsePipes(new ValidationPipe())
 export class BookmarkController {
   constructor(private bookmarkService: BookmarkService) {}
