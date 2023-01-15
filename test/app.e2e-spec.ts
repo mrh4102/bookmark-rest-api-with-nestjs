@@ -5,6 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { AppModule } from '../src/app.module';
 import { UserDto } from '../src/authentication/dto';
+import { CreateBookmarkDto, UpdateBookmarkDto } from '../src/bookmark/dto';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('AppController (e2e)', () => {
@@ -164,6 +165,109 @@ describe('AppController (e2e)', () => {
         expect(response.status).toBe(201);
         expect(response.headers['content-type']).toMatch(/json/);
         expect(response.body.access_token).toBeDefined();
+      });
+    });
+  });
+
+  let bookmarkId: number = 0;
+
+  describe('Bookmark', () => {
+    const createDto: CreateBookmarkDto = {
+      title: 'My bookmark',
+      description: 'My bookmark description',
+      url: 'https://bookmark.com',
+    };
+    const updateDto: UpdateBookmarkDto = {
+      title: createDto.title + 'x',
+      description: createDto.description + 'x',
+      url: createDto.url + 'x',
+    };
+
+    describe('select zero bookmarks initially', () => {
+      it('should select zero bookmarks initially', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks')
+          .set('Authorization', `Bearer ${accessToken1}`);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.length).toBe(0);
+      });
+    });
+
+    describe('create bookmark item', () => {
+      it('should create bookmark item', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/bookmarks')
+          .set('Authorization', `Bearer ${accessToken1}`)
+          .send(createDto);
+        expect(response.status).toBe(201);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.id).toBeGreaterThan(0);
+        expect(response.body.userId).toBeGreaterThan(0);
+        expect(response.body).toMatchObject(createDto);
+        bookmarkId = response.body.id;
+      });
+    });
+
+    describe('select one bookmark after creation', () => {
+      it('should select one bookmark after creation', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks')
+          .set('Authorization', `Bearer ${accessToken1}`);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.length).toBe(1);
+      });
+    });
+
+    describe('select bookmark by id', () => {
+      it('should select bookmark by id', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken1}`);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.id).toBeGreaterThan(0);
+        expect(response.body.userId).toBeGreaterThan(0);
+        expect(response.body).toMatchObject(createDto);
+      });
+    });
+
+    describe('update bookmark by id', () => {
+      it('should update bookmark by id', async () => {
+        const response = await request(app.getHttpServer())
+          .patch('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken1}`)
+          .send(updateDto);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.id).toBeGreaterThan(0);
+        expect(response.body.userId).toBeGreaterThan(0);
+        expect(response.body).toMatchObject(updateDto);
+      });
+    });
+
+    describe('delete bookmark by id', () => {
+      it('should delete bookmark by id', async () => {
+        const response = await request(app.getHttpServer())
+          .delete('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken1}`);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.id).toBeGreaterThan(0);
+        expect(response.body.userId).toBeGreaterThan(0);
+        expect(response.body).toMatchObject(updateDto);
+      });
+    });
+
+    describe('select zero bookmarks after deletion', () => {
+      it('should select zero bookmarks after deletion', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks')
+          .set('Authorization', `Bearer ${accessToken1}`);
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.length).toBe(0);
       });
     });
   });
