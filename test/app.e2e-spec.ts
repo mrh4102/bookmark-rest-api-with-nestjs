@@ -184,6 +184,13 @@ describe('AppController (e2e)', () => {
     };
 
     describe('select zero bookmarks initially', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).get('/bookmarks');
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
       it('should select zero bookmarks initially', async () => {
         const response = await request(app.getHttpServer())
           .get('/bookmarks')
@@ -195,6 +202,13 @@ describe('AppController (e2e)', () => {
     });
 
     describe('create bookmark item', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).post('/bookmarks');
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
       it('should create bookmark item', async () => {
         const response = await request(app.getHttpServer())
           .post('/bookmarks')
@@ -210,6 +224,13 @@ describe('AppController (e2e)', () => {
     });
 
     describe('select one bookmark after creation', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).get('/bookmarks');
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
       it('should select one bookmark after creation', async () => {
         const response = await request(app.getHttpServer())
           .get('/bookmarks')
@@ -221,6 +242,33 @@ describe('AppController (e2e)', () => {
     });
 
     describe('select bookmark by id', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).get(
+          '/bookmarks/' + bookmarkId,
+        );
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
+      it('should require a valid bookmark id', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks/' + bookmarkId + 1)
+          .set('Authorization', `Bearer ${accessToken2}`);
+        expect(response.status).toBe(404);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Not Found');
+      });
+
+      it('should require a valid user ownership', async () => {
+        const response = await request(app.getHttpServer())
+          .get('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken2}`);
+        expect(response.status).toBe(403);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Forbidden');
+      });
+
       it('should select bookmark by id', async () => {
         const response = await request(app.getHttpServer())
           .get('/bookmarks/' + bookmarkId)
@@ -234,6 +282,35 @@ describe('AppController (e2e)', () => {
     });
 
     describe('update bookmark by id', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).patch(
+          '/bookmarks/' + bookmarkId,
+        );
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
+      it('should require a valid bookmark id', async () => {
+        const response = await request(app.getHttpServer())
+          .patch('/bookmarks/' + bookmarkId + 1)
+          .set('Authorization', `Bearer ${accessToken2}`)
+          .send(updateDto);
+        expect(response.status).toBe(404);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Not Found');
+      });
+
+      it('should require a valid user ownership', async () => {
+        const response = await request(app.getHttpServer())
+          .patch('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken2}`)
+          .send(updateDto);
+        expect(response.status).toBe(403);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Forbidden');
+      });
+
       it('should update bookmark by id', async () => {
         const response = await request(app.getHttpServer())
           .patch('/bookmarks/' + bookmarkId)
@@ -248,6 +325,33 @@ describe('AppController (e2e)', () => {
     });
 
     describe('delete bookmark by id', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).delete(
+          '/bookmarks/' + bookmarkId,
+        );
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
+      it('should require a valid bookmark id', async () => {
+        const response = await request(app.getHttpServer())
+          .delete('/bookmarks/' + bookmarkId + 1)
+          .set('Authorization', `Bearer ${accessToken2}`);
+        expect(response.status).toBe(404);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Not Found');
+      });
+
+      it('should require a valid user ownership', async () => {
+        const response = await request(app.getHttpServer())
+          .delete('/bookmarks/' + bookmarkId)
+          .set('Authorization', `Bearer ${accessToken2}`);
+        expect(response.status).toBe(403);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Forbidden');
+      });
+
       it('should delete bookmark by id', async () => {
         const response = await request(app.getHttpServer())
           .delete('/bookmarks/' + bookmarkId)
@@ -261,6 +365,13 @@ describe('AppController (e2e)', () => {
     });
 
     describe('select zero bookmarks after deletion', () => {
+      it('should require a valid access token', async () => {
+        const response = await request(app.getHttpServer()).get('/bookmarks');
+        expect(response.status).toBe(401);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body.message).toBe('Unauthorized');
+      });
+
       it('should select zero bookmarks after deletion', async () => {
         const response = await request(app.getHttpServer())
           .get('/bookmarks')
