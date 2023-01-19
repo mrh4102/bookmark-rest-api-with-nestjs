@@ -1,6 +1,6 @@
 ## Description
 
-A simple bookmark RESTful API created using the [Nest.js](https://github.com/nestjs/nest) framework in TypeScript mode. Includes user authentication, authorization using JWT, Passport.js, data persistence using Prisma ORM, unit testing, and e2e testing using jest and supertest.
+A simple bookmark RESTful API created using the [Nest.js](https://github.com/nestjs/nest) framework in TypeScript mode. Includes user authentication, authorization using JSON Web Token or JWT, Passport.js module integration, data persistence using Prisma ORM, unit testing, and e2e testing using jest and supertest.
 
 ## Installation
 
